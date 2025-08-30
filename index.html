@@ -3,25 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vikramadhithya Thotam - Interactive Resume</title>
+    <title>Vikramadhithya Thotam - Resume</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Cool Slate & Teal -->
-    <!-- Application Structure Plan: A single-page application with a fixed top navigation bar for smooth scrolling to thematic sections: Home, Skills, Experience, Projects, and Education. This structure provides a clear, intuitive user flow, allowing recruiters to quickly access specific information. The 'Home' section gives an immediate summary, 'Skills' uses a chart for visual impact, and 'Experience'/'Projects' use a clean, expandable layout to manage information density. This design prioritizes scannability and targeted information retrieval over a linear document format. -->
+    <!-- Application Structure Plan: The SPA is redesigned with a minimalist, single-page flow. The Home section now features a central image and quick facts. All content is organized into expandable cards to reduce visual clutter and provide a clean, scannable initial view. This design strategy encourages user interaction by requiring a click to reveal detailed information, making the experience more active and less overwhelming. The fixed navigation bar with a scroll-triggered shadow provides easy access to all sections. -->
     <!-- Visualization & Content Choices: 
-        - Summary -> Inform -> Text Block -> Static -> Clear initial impression -> HTML/Tailwind.
-        - Technical Skills -> Compare/Inform -> Horizontal Bar Chart -> Interactive Filtering/Hover -> Visually engaging way to assess capabilities quickly -> Chart.js (Canvas).
-        - Work Experience -> Organize -> Vertical Timeline with Details -> Static list -> Chronological clarity and detail on demand -> HTML/Tailwind.
-        - Projects -> Organize -> Card Grid with Details -> Static list -> Scannable overview of hands-on work -> HTML/Tailwind.
-        - Education -> Inform -> Simple List -> Static -> Clear, concise presentation of academic background -> HTML/Tailwind.
+        - Profile Image & Summary -> Inform -> Image & Text Block -> Static with a subtle entrance animation -> Creates an immediate personal connection -> HTML/Tailwind.
+        - Technical Skills -> Compare/Inform -> Horizontal Bar Chart -> Interactive Filtering -> Visually engaging and allows for quick comparison of abilities -> Chart.js (Canvas).
+        - Experience & Projects -> Organize -> Expandable Cards/Lists -> Click-to-show details -> Minimizes initial clutter and puts the user in control of information consumption -> HTML/Tailwind/JS.
+        - Education & Certifications -> Inform -> Card Grid with External Links -> Static with click action -> Provides a scannable overview and directs users to external proof of qualifications -> HTML/Tailwind.
     -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
         }
         .chart-container {
             position: relative;
@@ -37,55 +37,62 @@
                 height: 500px;
             }
         }
+        .section-header {
+            margin-bottom: 2.5rem;
+        }
+        .card {
+            transition: all 0.3s ease-in-out;
+            cursor: pointer;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <nav class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
-        <div class="container mx-auto px-6 py-3">
-            <div class="flex justify-between items-center">
-                <h1 class="text-xl font-bold text-slate-900">Vikramadhithya Thotam</h1>
-                <div class="hidden md:flex space-x-8">
-                    <a href="#summary" class="text-slate-600 hover:text-teal-600 transition-colors">Summary</a>
-                    <a href="#skills" class="text-slate-600 hover:text-teal-600 transition-colors">Skills</a>
-                    <a href="#experience" class="text-slate-600 hover:text-teal-600 transition-colors">Experience</a>
-                    <a href="#projects" class="text-slate-600 hover:text-teal-600 transition-colors">Projects</a>
-                    <a href="#education" class="text-slate-600 hover:text-teal-600 transition-colors">Education</a>
-                </div>
-                <div class="md:hidden">
-                    <button id="menu-btn" class="text-slate-800 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
-                    </button>
-                </div>
+    <nav id="navbar" class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 transition-shadow duration-300">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-slate-900">Vikramadhithya Thotam</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#summary" class="text-slate-600 hover:text-teal-600 transition-colors">Summary</a>
+                <a href="#skills" class="text-slate-600 hover:text-teal-600 transition-colors">Skills</a>
+                <a href="#experience" class="text-slate-600 hover:text-teal-600 transition-colors">Experience</a>
+                <a href="#projects" class="text-slate-600 hover:text-teal-600 transition-colors">Projects</a>
+                <a href="#education" class="text-slate-600 hover:text-teal-600 transition-colors">Education</a>
             </div>
-            <div id="mobile-menu" class="hidden md:hidden mt-4">
-                <a href="#summary" class="block py-2 text-slate-600 hover:text-teal-600">Summary</a>
-                <a href="#skills" class="block py-2 text-slate-600 hover:text-teal-600">Skills</a>
-                <a href="#experience" class="block py-2 text-slate-600 hover:text-teal-600">Experience</a>
-                <a href="#projects" class="block py-2 text-slate-600 hover:text-teal-600">Projects</a>
-                <a href="#education" class="block py-2 text-slate-600 hover:text-teal-600">Education</a>
+            <div class="md:hidden">
+                <button id="menu-btn" class="text-slate-800 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                </button>
             </div>
+        </div>
+        <div id="mobile-menu" class="hidden md:hidden mt-4 text-center">
+            <a href="#summary" class="block py-2 text-slate-600 hover:text-teal-600">Summary</a>
+            <a href="#skills" class="block py-2 text-slate-600 hover:text-teal-600">Skills</a>
+            <a href="#experience" class="block py-2 text-slate-600 hover:text-teal-600">Experience</a>
+            <a href="#projects" class="block py-2 text-slate-600 hover:text-teal-600">Projects</a>
+            <a href="#education" class="block py-2 text-slate-600 hover:text-teal-600">Education</a>
         </div>
     </nav>
 
     <main class="container mx-auto px-6 py-12">
 
-        <section id="summary" class="min-h-[60vh] flex items-center">
-            <div class="w-full">
-                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">VIKRAMADHITHYA THOTAM</h2>
-                <p class="text-lg text-slate-600 mb-6">Naidupeta, Andhra Pradesh | thotamvikramadhithya@gmail.com | +91 8096320035</p>
-                <div class="max-w-4xl bg-white p-8 rounded-xl shadow-md border border-slate-200">
-                    <h3 class="text-2xl font-semibold text-teal-700 mb-4">Professional Summary</h3>
-                    <p class="text-slate-700 leading-relaxed">
-                        Detail-oriented and results-driven professional with a strong foundation in data analysis, statistical modeling, and machine learning. Proven ability to apply advanced algorithms and analytical solutions to complex problems, generate valuable insights, and communicate findings effectively to stakeholders.
-                    </p>
-                </div>
+        <section id="summary" class="min-h-[60vh] flex items-center justify-center text-center">
+            <div class="w-full max-w-2xl mx-auto">
+                <img class="w-36 h-36 rounded-full mx-auto mb-6 shadow-lg border-4 border-white transition-transform duration-300 hover:scale-105" src="https://placehold.co/150x150/e2e8f0/64748b?text=VT" alt="Profile Picture">
+                <h2 class="text-4xl md:text-5xl font-bold text-slate-900 mb-2">VIKRAMADHITHYA THOTAM</h2>
+                <p class="text-lg text-slate-600 mb-8">Data Science & Bioinformatics Professional</p>
+                <p class="text-slate-700 leading-relaxed max-w-lg mx-auto">
+                    Detail-oriented and results-driven professional with a strong foundation in data analysis, statistical modeling, and machine learning. Proven ability to apply advanced algorithms and analytical solutions to complex problems, generate valuable insights, and communicate findings effectively to stakeholders.
+                </p>
             </div>
         </section>
 
         <section id="skills" class="py-20">
-            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4">Technical Skills Dashboard</h2>
-            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">This section provides an interactive overview of my technical abilities. You can hover over the chart bars for more details and use the buttons below to filter the skills by category, allowing you to focus on the areas most relevant to your needs.</p>
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4 section-header">Technical Skills</h2>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">This section provides an interactive overview of my technical abilities. Use the buttons below to filter the skills by category to focus on the areas most relevant to your needs.</p>
             <div class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-200">
                 <div class="flex justify-center flex-wrap gap-2 mb-8">
                     <button class="skill-filter-btn bg-teal-600 text-white px-4 py-2 rounded-full text-sm font-medium" data-category="all">All Skills</button>
@@ -101,66 +108,86 @@
         </section>
 
         <section id="experience" class="py-20">
-            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4">Work Experience</h2>
-             <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">Here you'll find a summary of my professional role, detailing the key responsibilities and accomplishments. This section showcases my hands-on experience in applying machine learning and data analysis to solve real-world problems.</p>
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4 section-header">Work Experience</h2>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">Click on the card to expand and view my key responsibilities and accomplishments in each role.</p>
             <div class="max-w-4xl mx-auto">
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                    <div class="flex justify-between items-start">
+                <div class="card bg-white p-8 rounded-xl shadow-lg border border-slate-200 toggle-details">
+                    <div class="flex justify-between items-center mb-4">
                         <div>
                             <h3 class="text-xl font-bold text-teal-700">JUNIOR BIOINFORMATICIAN</h3>
                             <p class="text-slate-600 font-medium">ANDERSON DIAGNOSTICS SERVICES PVT LTD.</p>
                         </div>
                         <p class="text-slate-500 text-right">April 2024 - Present</p>
                     </div>
-                    <ul class="mt-6 list-disc list-inside space-y-3 text-slate-700">
-                        <li>Developed and implemented machine learning models for classifying clinically uncertain variants, delivering impactful solutions to support business decision-making.</li>
-                        <li>Led the development and maintenance of variant analysis pipelines using GATK, Python, and Nextflow, applying advanced algorithms and analytical solutions to genomic data.</li>
-                        <li>Collaborated with cross-functional teams to understand business needs and formulate data-driven solutions for complex projects.</li>
-                        <li>Contributed to the continuous improvement of methodologies by applying scripting and version control for reproducible workflows.</li>
-                        <li>Preprocessed and curated large genomic datasets (VCF, BAM, FASTQ) to ensure data quality and integrity for downstream analysis.</li>
-                    </ul>
+                    <div class="details-content hidden">
+                        <ul class="list-disc list-inside space-y-3 text-slate-700">
+                            <li>Worked on the reclassification of Variants of Uncertain Significance (VUS) by developing and applying machine learning models (XGBoost and Gradient Boosting) to enhance diagnostic accuracy.</li>
+                            <li>Led the development and maintenance of variant analysis pipelines using GATK, Python, and Nextflow, applying advanced algorithms and analytical solutions to genomic data.</li>
+                            <li>Collaborated with cross-functional teams to understand business needs and formulate data-driven solutions for complex projects.</li>
+                            <li>Contributed to the continuous improvement of methodologies by applying scripting and version control for reproducible workflows.</li>
+                            <li>Preprocessed and curated large genomic datasets (VCF, BAM, FASTQ) to ensure data quality and integrity for downstream analysis.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="projects" class="py-20">
-            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4">Key Projects</h2>
-            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">This area highlights significant projects I have completed. Each project demonstrates my ability to manage data-driven initiatives from concept to completion, employing various machine learning algorithms and data analysis techniques.</p>
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4 section-header">Key Projects</h2>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">This area highlights significant projects I have completed. Click on each card to see the details and my contributions.</p>
             <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                    <h3 class="text-xl font-bold text-teal-700 mb-2">Early Prediction Of Sepsis Disease using Machine Learning Algorithm</h3>
-                    <p class="text-slate-500 mb-4">June 2024</p>
-                    <ul class="list-disc list-inside space-y-2 text-slate-700">
-                        <li>Identified and analyzed relevant clinical and laboratory parameters, such as vital signs and white blood cell count, as key indicators for sepsis.</li>
-                        <li>Employed machine learning algorithms, including Support Vector Machine, K-Nearest Neighbor, and Gradient Boosting, to train predictive models on historical patient data.</li>
-                    </ul>
+                <div class="card bg-white p-8 rounded-xl shadow-lg border border-slate-200 toggle-details">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-teal-700 mb-2">Early Prediction Of Sepsis Disease using Machine Learning Algorithm</h3>
+                        <p class="text-slate-500">June 2024</p>
+                    </div>
+                    <div class="details-content hidden">
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                            <li>Identified and analyzed relevant clinical and laboratory parameters, such as vital signs and white blood cell count, as key indicators for sepsis.</li>
+                            <li>Employed machine learning algorithms, including Support Vector Machine, K-Nearest Neighbor, and Gradient Boosting, to train predictive models on historical patient data.</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
-                    <h3 class="text-xl font-bold text-teal-700 mb-2">Clean and Analyze Social Media Usage Data with Python</h3>
-                    <p class="text-slate-500 mb-4">November 2023</p>
-                    <ul class="list-disc list-inside space-y-2 text-slate-700">
-                        <li>Developed a data analysis algorithm to provide statistical analysis of social media usage.</li>
-                        <li>Generated valuable insights from social media usage data.</li>
-                    </ul>
+                <div class="card bg-white p-8 rounded-xl shadow-lg border border-slate-200 toggle-details">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold text-teal-700 mb-2">Clean and Analyze Social Media Usage Data with Python</h3>
+                        <p class="text-slate-500">November 2023</p>
+                    </div>
+                    <div class="details-content hidden">
+                        <ul class="list-disc list-inside space-y-2 text-slate-700">
+                            <li>Developed a data analysis algorithm to provide statistical analysis of social media usage.</li>
+                            <li>Generated valuable insights from social media usage data.</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
 
         <section id="education" class="py-20">
-            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4">Education & Certifications</h2>
-             <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">My academic background and professional certifications are outlined below, forming the foundation of my technical expertise in Bioinformatics and development.</p>
+            <h2 class="text-3xl font-bold text-center text-slate-900 mb-4 section-header">Education & Certifications</h2>
+            <p class="text-center text-slate-600 mb-12 max-w-3xl mx-auto">My academic background and professional certifications are outlined below, forming the foundation of my technical expertise in Bioinformatics and development.</p>
             <div class="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-                <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                <a href="#" class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 block no-underline text-inherit card">
                     <h3 class="text-xl font-bold text-teal-700">B.Tech, Bioinformatics</h3>
                     <p class="text-slate-600">Saveetha School of Engineering</p>
                     <p class="text-slate-500">June 2020 - October 2024</p>
                     <p class="mt-2 text-slate-700">CGPA: 8.25</p>
-                </div>
-                 <div class="bg-white p-8 rounded-xl shadow-lg border border-slate-200">
+                </a>
+                <a href="https://coursera.org/share/08af25bd4c256f503adf9e9dd62382ca" target="_blank" class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 block no-underline text-inherit card">
                     <h3 class="text-xl font-bold text-teal-700">Introduction to Back-End Development</h3>
                     <p class="text-slate-600">Meta</p>
                     <p class="text-slate-500">November 2023</p>
-                </div>
+                </a>
+                <a href="https://www.hackerrank.com/certificates/af7e15e6e244" target="_blank" class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 block no-underline text-inherit card">
+                    <h3 class="text-xl font-bold text-teal-700">Software Engineer Intern</h3>
+                    <p class="text-slate-600">HackerRank</p>
+                    <p class="text-slate-500">March 2023</p>
+                </a>
+                <a href="#" target="_blank" class="bg-white p-8 rounded-xl shadow-lg border border-slate-200 block no-underline text-inherit card">
+                    <h3 class="text-xl font-bold text-teal-700">Business Analytics for Management Decisions</h3>
+                    <p class="text-slate-600">NPTEL</p>
+                    <p class="text-slate-500">August 2023</p>
+                </a>
             </div>
         </section>
     </main>
@@ -175,8 +202,18 @@
         document.addEventListener('DOMContentLoaded', function () {
             const menuBtn = document.getElementById('menu-btn');
             const mobileMenu = document.getElementById('mobile-menu');
+            const navbar = document.getElementById('navbar');
+
             menuBtn.addEventListener('click', () => {
                 mobileMenu.classList.toggle('hidden');
+            });
+
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 50) {
+                    navbar.classList.add('shadow-lg');
+                } else {
+                    navbar.classList.remove('shadow-lg');
+                }
             });
 
             const skillsData = {
@@ -295,6 +332,16 @@
             });
 
             updateChart('all');
+
+            const toggleCards = document.querySelectorAll('.toggle-details');
+            toggleCards.forEach(card => {
+                card.addEventListener('click', (event) => {
+                    const content = card.querySelector('.details-content');
+                    if (content) {
+                        content.classList.toggle('hidden');
+                    }
+                });
+            });
         });
     </script>
 </body>
